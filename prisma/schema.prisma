@@ -1,0 +1,492 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Organization {
+  id          String   @id @default(cuid())
+  name        String
+  industry    String?
+  fiscalYear  String   @default("FY2026")
+  createdAt   DateTime @default(now())
+
+  businessUnits    BusinessUnit[]
+  workforcePlans   WorkforcePlan[]
+  users            User[]
+  agentRuns        AgentRun[]
+  ingestedDocs     IngestedDocument[]
+  functionAnalyses FunctionAnalysis[]
+}
+
+model User {
+  id             String   @id @default(cuid())
+  email          String   @unique
+  name           String
+  role           UserRole @default(VIEWER)
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  createdAt      DateTime @default(now())
+}
+
+enum UserRole {
+  ADMIN
+  PLANNER
+  HRBP
+  FINANCE
+  VIEWER
+}
+
+model BusinessUnit {
+  id             String   @id @default(cuid())
+  name           String
+  code           String
+  organizationId String
+  parentId       String?
+  headCount      Int      @default(0)
+  budget         Float    @default(0)
+  location       String[]
+
+  organization  Organization   @relation(fields: [organizationId], references: [id])
+  parent        BusinessUnit?  @relation("BUHierarchy", fields: [parentId], references: [id])
+  children      BusinessUnit[] @relation("BUHierarchy")
+  roles         Role[]
+  planSnapshots PlanSnapshot[]
+}
+
+model WorkforcePlan {
+  id             String     @id @default(cuid())
+  name           String
+  type           PlanType
+  fiscalYear     String
+  status         PlanStatus @default(DRAFT)
+  organizationId String
+  createdBy      String
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  organization Organization   @relation(fields: [organizationId], references: [id])
+  scenarios    Scenario[]
+  milestones   Milestone[]
+  snapshots    PlanSnapshot[]
+  reviews      PlanReview[]
+}
+
+enum PlanType {
+  THREE_YEAR_STRATEGIC
+  ANNUAL
+  QUARTERLY
+  AI_TRANSFORMATION
+}
+
+enum PlanStatus {
+  DRAFT
+  IN_REVIEW
+  APPROVED
+  ACTIVE
+  ARCHIVED
+}
+
+model Scenario {
+  id             String       @id @default(cuid())
+  name           String
+  description    String?
+  type           ScenarioType
+  assumptions    Json
+  headcountDelta Int          @default(0)
+  budgetImpact   Float        @default(0)
+  riskScore      Float        @default(0)
+  planId         String
+
+  plan      WorkforcePlan      @relation(fields: [planId], references: [id])
+  lineItems ScenarioLineItem[]
+}
+
+enum ScenarioType {
+  BASE
+  OPTIMISTIC
+  CONSERVATIVE
+  AI_AUGMENTED
+  RESTRUCTURE
+}
+
+model ScenarioLineItem {
+  id         String   @id @default(cuid())
+  scenarioId String
+  roleId     String
+  action     HCAction
+  qty        Int
+  quarter    String
+  cost       Float
+  rationale  String?
+
+  scenario Scenario @relation(fields: [scenarioId], references: [id])
+  role     Role     @relation(fields: [roleId], references: [id])
+}
+
+enum HCAction {
+  HIRE
+  BACKFILL
+  PROMOTE
+  TRANSFER
+  ELIMINATE
+  AUTOMATE
+  CONVERT_AGENT
+}
+
+model Role {
+  id             String   @id @default(cuid())
+  title          String
+  jobFamily      String
+  gradeLevel     String
+  location       String[]
+  businessUnitId String
+  isOpen         Boolean  @default(false)
+  salaryBand     Json
+  skills         String[]
+  fteEquivalent  Float    @default(1.0)
+  isDigitalLabor Boolean  @default(false)
+  attritionRisk  Float    @default(0)
+  aiRiskScore    Float    @default(0)
+
+  businessUnit    BusinessUnit       @relation(fields: [businessUnitId], references: [id])
+  lineItems       ScenarioLineItem[]
+  attritionScores AttritionScore[]
+}
+
+model SkillsInventory {
+  id           String @id @default(cuid())
+  skillName    String
+  category     String
+  currentCount Int
+  targetCount  Int
+  gapScore     Float
+  aiRiskScore  Float
+  orgId        String
+  quarter      String
+}
+
+model PlanSnapshot {
+  id             String   @id @default(cuid())
+  planId         String
+  businessUnitId String
+  headcount      Int
+  openReqs       Int
+  attrition      Float
+  budgetUsed     Float
+  period         String
+  createdAt      DateTime @default(now())
+
+  plan         WorkforcePlan @relation(fields: [planId], references: [id])
+  businessUnit BusinessUnit  @relation(fields: [businessUnitId], references: [id])
+}
+
+model Milestone {
+  id      String          @id @default(cuid())
+  planId  String
+  title   String
+  dueDate DateTime
+  status  MilestoneStatus @default(NOT_STARTED)
+  owner   String
+
+  plan WorkforcePlan @relation(fields: [planId], references: [id])
+}
+
+enum MilestoneStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETE
+  AT_RISK
+  BLOCKED
+}
+
+model AgentRun {
+  id             String      @id @default(cuid())
+  agentType      AgentType
+  status         AgentStatus @default(PENDING)
+  input          Json
+  output         Json?
+  tokensUsed     Int         @default(0)
+  costUsd        Float       @default(0)
+  durationMs     Int?
+  errorMessage   String?
+  organizationId String
+  triggeredBy    String
+  createdAt      DateTime    @default(now())
+  completedAt    DateTime?
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+}
+
+enum AgentType {
+  ATTRITION_PREDICTOR
+  MARKET_INTELLIGENCE
+  DOCUMENT_INGESTION
+  RISK_AUDITOR
+  BUDGET_VALIDATOR
+  BENCHMARK_COMPARATOR
+  DEEP_THINKING
+  COPILOT
+  COLLABORATION_ADVISOR
+}
+
+enum AgentStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+model AttritionScore {
+  id          String   @id @default(cuid())
+  roleId      String
+  cohortKey   String
+  riskScore   Float
+  riskTier    RiskTier
+  topDrivers  Json
+  predictedAt DateTime @default(now())
+
+  role Role @relation(fields: [roleId], references: [id])
+}
+
+enum RiskTier {
+  LOW
+  MODERATE
+  ELEVATED
+  HIGH
+  CRITICAL
+}
+
+model MarketSignal {
+  id         String     @id @default(cuid())
+  signalType SignalType
+  jobFamily  String?
+  location   String?
+  data       Json
+  summary    String
+  sources    String[]
+  capturedAt DateTime   @default(now())
+}
+
+enum SignalType {
+  TALENT_SUPPLY
+  COMPETITOR_HIRING
+  SALARY_BENCHMARK
+  SKILLS_TREND
+  LAYOFF_NEWS
+  REGULATORY
+}
+
+model IngestedDocument {
+  id               String   @id @default(cuid())
+  organizationId   String
+  fileName         String
+  fileType         String
+  rawText          String
+  extractedSignals Json
+  uploadedBy       String
+  uploadedAt       DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+}
+
+model PlanReview {
+  id                String       @id @default(cuid())
+  planId            String
+  status            ReviewStatus @default(IN_PROGRESS)
+  riskFindings      Json
+  budgetFindings    Json
+  benchmarkFindings Json
+  conflicts         Json
+  overallScore      Float        @default(0)
+  recommendation    String?
+  createdAt         DateTime     @default(now())
+  completedAt       DateTime?
+
+  plan WorkforcePlan @relation(fields: [planId], references: [id])
+}
+
+enum ReviewStatus {
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+}
+
+model FunctionAnalysis {
+  id                   String         @id @default(cuid())
+  organizationId       String
+  functionName         String
+  businessUnitId       String?
+  scope                String
+  status               AnalysisStatus @default(DRAFT)
+  workflowMap          Json
+  taskInventory        Json
+  productivityBaseline Json
+  aiReadinessScore     Float          @default(0)
+  createdBy            String
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
+
+  organization           Organization            @relation(fields: [organizationId], references: [id])
+  taskAugmentations      TaskAugmentation[]
+  roleRedesigns          RoleRedesign[]
+  toolingRecommendations ToolingRecommendation[]
+  roadmap                ImplementationRoadmap?
+  productivityProjection ProductivityProjection?
+  antiPatterns           AntiPattern[]
+}
+
+enum AnalysisStatus {
+  DRAFT
+  ANALYZING
+  COMPLETED
+  IN_IMPLEMENTATION
+  ARCHIVED
+}
+
+model TaskAugmentation {
+  id                    String        @id @default(cuid())
+  functionAnalysisId    String
+  taskName              String
+  taskDescription       String
+  currentOwner          String
+  weeklyHoursTotal      Float
+  augmentationMode      AugmentMode
+  rationale             String
+  agentforceCapability  String?
+  alternativeTools      String[]
+  estimatedHoursSaved   Float
+  qualityImpact         QualityImpact
+  humanJudgmentRequired Boolean       @default(false)
+  confidenceScore       Float
+
+  functionAnalysis FunctionAnalysis @relation(fields: [functionAnalysisId], references: [id], onDelete: Cascade)
+}
+
+enum AugmentMode {
+  DO
+  ASSIST
+  CHECK
+  AVOID
+}
+
+enum QualityImpact {
+  IMPROVES
+  NEUTRAL
+  REQUIRES_OVERSIGHT
+  DEGRADES_RISK
+}
+
+model RoleRedesign {
+  id                  String   @id @default(cuid())
+  functionAnalysisId  String
+  roleName            String
+  currentTitle        String
+  redesignedTitle     String
+  currentHCEquivalent Float
+  futureHCEquivalent  Float
+  removedTasks        Json
+  retainedTasks       Json
+  newTasks            Json
+  newSkillsRequired   String[]
+  reskillingPath      String
+  gradeLevelChange    String?
+  riskFlags           String[]
+
+  functionAnalysis FunctionAnalysis @relation(fields: [functionAnalysisId], references: [id], onDelete: Cascade)
+}
+
+model ToolingRecommendation {
+  id                   String       @id @default(cuid())
+  functionAnalysisId   String
+  toolName             String
+  category             ToolCategory
+  vendor               String
+  isAgentforce         Boolean      @default(false)
+  useCase              String
+  affectedTasks        String[]
+  estimatedCost        Float?
+  estimatedTimeToValue Int
+  prerequisites        String[]
+  priority             Priority
+
+  functionAnalysis FunctionAnalysis @relation(fields: [functionAnalysisId], references: [id], onDelete: Cascade)
+}
+
+enum ToolCategory {
+  AGENT_PLATFORM
+  WORKFLOW_AUTOMATION
+  DATA_INTELLIGENCE
+  COMMUNICATION
+  PRODUCTIVITY
+  ANALYTICS
+}
+
+enum Priority {
+  IMMEDIATE
+  NEAR_TERM
+  MEDIUM_TERM
+  LONG_TERM
+}
+
+model ImplementationRoadmap {
+  id                   String   @id @default(cuid())
+  functionAnalysisId   String   @unique
+  ninetyDay            Json
+  oneEightyDay         Json
+  threeSixtyFiveDay    Json
+  changeManagementPlan String
+  successMetrics       Json
+  risksAndMitigations  Json
+
+  functionAnalysis FunctionAnalysis @relation(fields: [functionAnalysisId], references: [id], onDelete: Cascade)
+}
+
+model ProductivityProjection {
+  id                      String @id @default(cuid())
+  functionAnalysisId      String @unique
+  hoursSavedPerWeek       Float
+  fteEquivalentSaved      Float
+  costSavingsAnnualUsd    Float
+  revenueLiftAnnualUsd    Float?
+  costPerOutcomeBefore    Float?
+  costPerOutcomeAfter     Float?
+  employeeExperienceScore Float
+  paybackPeriodMonths     Float
+  threeYearNPV            Float
+  assumptionsLog          Json
+  sensitivityAnalysis     Json
+
+  functionAnalysis FunctionAnalysis @relation(fields: [functionAnalysisId], references: [id], onDelete: Cascade)
+}
+
+model AntiPattern {
+  id                 String              @id @default(cuid())
+  functionAnalysisId String
+  patternType        AntiPatternType
+  severity           AntiPatternSeverity
+  description        String
+  affectedTasks      String[]
+  mitigation         String
+
+  functionAnalysis FunctionAnalysis @relation(fields: [functionAnalysisId], references: [id], onDelete: Cascade)
+}
+
+enum AntiPatternType {
+  RUBBER_STAMP
+  JUDGMENT_LOSS
+  SKILL_ATROPHY
+  ACCOUNTABILITY_GAP
+  ENGAGEMENT_RISK
+  BIAS_AMPLIFICATION
+  OVER_AUTOMATION
+  INTEGRATION_DEBT
+}
+
+enum AntiPatternSeverity {
+  ADVISORY
+  CAUTION
+  BLOCKER
+}
