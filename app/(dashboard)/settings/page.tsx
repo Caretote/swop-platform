@@ -65,7 +65,7 @@ export default function SettingsPage() {
                   { label: "Last Name", defaultValue: "Jones" },
                   { label: "Email", defaultValue: "michael.jones@acmecorp.com" },
                   { label: "Title", defaultValue: "Chief People Officer" },
-                  { label: "Organization", defaultValue: "Acme Corp" },
+                  { label: "Organization", defaultValue: "MJ Corp" },
                   { label: "Time Zone", defaultValue: "America/New_York" },
                 ].map((f) => (
                   <div key={f.label}>

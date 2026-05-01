@@ -43,7 +43,7 @@ export default function NewPlanPage() {
   const generateNarrative = async () => {
     setGenerating(true);
     await new Promise((r) => setTimeout(r, 1500));
-    setNarrative(`**FY2026 Workforce Plan — Executive Summary**\n\nAcme Corp's ${form.name || "FY2026 Workforce Plan"} targets ${form.revenueGrowth}% revenue growth with a net headcount increase of ~60 FTEs across ${form.businessUnits.length || 5} business units. Key assumptions include an ${form.attrition}% attrition rate and ${form.aiOffset}% AI/automation offset — primarily in Sales SDR and CS support tiers. The plan carries moderate execution risk given current Engineering hiring velocity (82-day avg TTF vs. 45-day assumption). Recommend phasing Q1 Engineering hires into Q2 to de-risk.`);
+    setNarrative(`**FY2026 Workforce Plan — Executive Summary**\n\nMJ Corp's ${form.name || "FY2026 Workforce Plan"} targets ${form.revenueGrowth}% revenue growth with a net headcount increase of ~60 FTEs across ${form.businessUnits.length || 5} business units. Key assumptions include an ${form.attrition}% attrition rate and ${form.aiOffset}% AI/automation offset — primarily in Sales SDR and CS support tiers. The plan carries moderate execution risk given current Engineering hiring velocity (82-day avg TTF vs. 45-day assumption). Recommend phasing Q1 Engineering hires into Q2 to de-risk.`);
     setGenerating(false);
   };
 
@@ -214,7 +214,7 @@ export default function NewPlanPage() {
                   </tfoot>
                 </table>
               </div>
-              <p className="text-xs text-[#94A3B8]">Auto-populated from Acme Corp HRIS. Last sync: 2h ago.</p>
+              <p className="text-xs text-[#94A3B8]">Auto-populated from MJ Corp HRIS. Last sync: 2h ago.</p>
             </>
           )}
 

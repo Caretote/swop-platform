@@ -11,7 +11,7 @@ async function main() {
     update: {},
     create: {
       id: "org_acme",
-      name: "Acme Corp",
+      name: "MJ Corp",
       industry: "Enterprise SaaS",
       fiscalYear: "FY2026",
     },
@@ -442,7 +442,7 @@ async function main() {
     },
   });
 
-  console.log("✅ Seed complete — Acme Corp (2,400 employees) ready");
+  console.log("✅ Seed complete — MJ Corp (2,400 employees) ready");
   console.log(`   Org: ${org.id}`);
   console.log(`   BUs: ${bus.length}`);
   console.log(`   Roles: ${roles.length}`);

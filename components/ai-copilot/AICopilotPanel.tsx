@@ -169,7 +169,7 @@ export function AICopilotPanel({ open, onClose }: Props) {
                     <div className="w-12 h-12 mx-auto mb-3 rounded-2xl bg-[#8B5CF6]/15 border border-[#8B5CF6]/25 flex items-center justify-center">
                       <Sparkles className="w-6 h-6 text-[#A78BFA]" />
                     </div>
-                    <p className="text-sm text-[#94A3B8]">Ask anything about Acme Corp&apos;s workforce</p>
+                    <p className="text-sm text-[#94A3B8]">Ask anything about MJ Corp&apos;s workforce</p>
                     {deepThink && <p className="text-xs text-[#A78BFA] mt-1">Deep Think mode: extended reasoning enabled</p>}
                   </div>
                   <div className="grid grid-cols-1 gap-2">

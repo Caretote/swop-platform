@@ -190,7 +190,7 @@ export function Sidebar() {
             <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#2563EB] to-[#0EA5E9] flex items-center justify-center text-[10px] font-bold text-white">MJ</div>
             <div className="min-w-0 flex-1">
               <div className="text-xs font-medium text-white truncate">Michael Jones</div>
-              <div className="text-[10px] text-[#94A3B8] truncate">Acme Corp · Admin</div>
+              <div className="text-[10px] text-[#94A3B8] truncate">MJ Corp · Admin</div>
             </div>
           </div>
         </div>

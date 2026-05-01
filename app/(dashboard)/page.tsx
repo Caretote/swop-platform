@@ -89,7 +89,7 @@ export default function DashboardPage() {
           Executive Command Center
         </h1>
         <p className="text-sm text-[#94A3B8] mt-1">
-          Acme Corp · FY2026 · Real-time workforce intelligence
+          MJ Corp · FY2026 · Real-time workforce intelligence
         </p>
       </motion.div>
 

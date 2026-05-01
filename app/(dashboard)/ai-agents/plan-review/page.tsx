@@ -72,7 +72,7 @@ const MOCK_RESULT = {
       { category: "Span of Control", severity: "low", description: "Engineering avg span 7.2 — within benchmark range 6-9." },
     ],
   },
-  conflicts: [{ description: "Risk Auditor flagged HIGH on TTF assumptions; Benchmark Comparator says TTF is normal for market. Recommend: accept Risk finding — Acme's TTF specifically has been running slow, not market average." }],
+  conflicts: [{ description: "Risk Auditor flagged HIGH on TTF assumptions; Benchmark Comparator says TTF is normal for market. Recommend: accept Risk finding — MJ Corp's TTF specifically has been running slow, not market average." }],
   overallScore: 72,
   recommendation: "Approve with modifications: revise hiring lead time assumptions to 75 days for Engineering and increase benefits loading factor to 23%.",
 };
