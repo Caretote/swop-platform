@@ -187,9 +187,9 @@ export function Sidebar() {
       {!collapsed && (
         <div className="px-3 py-3 border-t border-white/8 shrink-0">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#2563EB] to-[#0EA5E9] flex items-center justify-center text-[10px] font-bold text-white">AC</div>
+            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#2563EB] to-[#0EA5E9] flex items-center justify-center text-[10px] font-bold text-white">MJ</div>
             <div className="min-w-0 flex-1">
-              <div className="text-xs font-medium text-white truncate">Alex Chen</div>
+              <div className="text-xs font-medium text-white truncate">Michael Jones</div>
               <div className="text-[10px] text-[#94A3B8] truncate">Acme Corp · Admin</div>
             </div>
           </div>

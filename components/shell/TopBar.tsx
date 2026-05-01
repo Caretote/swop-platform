@@ -57,8 +57,8 @@ export function TopBar({ onOpenCopilot, onOpenCommandPalette }: TopBarProps) {
 
         {/* User avatar */}
         <button className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-white/5 transition-colors">
-          <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#2563EB] to-[#0EA5E9] flex items-center justify-center text-[11px] font-bold text-white">AC</div>
-          <span className="text-sm text-[#94A3B8]">Alex Chen</span>
+          <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#2563EB] to-[#0EA5E9] flex items-center justify-center text-[11px] font-bold text-white">MJ</div>
+          <span className="text-sm text-[#94A3B8]">Michael Jones</span>
           <ChevronDown className="w-3 h-3 text-[#94A3B8]/50" />
         </button>
       </div>
