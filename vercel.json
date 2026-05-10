@@ -4,6 +4,10 @@
   "installCommand": "npm install",
   "crons": [
     {
+      "path": "/api/cron/keepalive",
+      "schedule": "0 8 */3 * *"
+    },
+    {
       "path": "/api/cron/attrition",
       "schedule": "0 6 * * *"
     },
